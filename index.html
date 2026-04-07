@@ -31,7 +31,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 15px;
         }
 
         /* Conteneur principal */
@@ -43,27 +43,30 @@
 
         /* Glassmorphism card */
         .glass-card {
-            background: rgba(255, 255, 255, 0.95);
+            /* background: rgba(255, 255, 255, 0.95); */
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-radius: 48px;
-            padding: 28px;
+            /* border-radius: 48px; */
+            padding: 0px;
             border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.02);
+            /* box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.02); */
             transition: transform 0.2s;
         }
 
         /* Header avec logo */
         .logo-header {
-            text-align: center;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            text-align: left;
             margin-bottom: 28px;
         }
 
         .logo-icon {
-            width: 70px;
-            height: 70px;
+            width: 55px;
+            height: 50px;
             background: #FF3B30;
-            border-radius: 24px;
+            border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -74,7 +77,9 @@
         }
 
         .logo-header h1 {
-            font-size: 32px;
+            font-size: 25px;
+            margin-left: 5px;
+            align-items: center;
             font-weight: 800;
             background: linear-gradient(135deg, #FF3B30, #C41E3A);
             -webkit-background-clip: text;
@@ -87,7 +92,6 @@
             font-size: 13px;
             color: #666;
             font-weight: 500;
-            margin-top: 6px;
         }
 
         /* Titres de section */
@@ -424,8 +428,12 @@
             <div class="logo-icon">
                 <i class="fas fa-signature"></i>
             </div>
-            <h1>ProSign</h1>
-            <p>Signature électronique professionnelle</p>
+            <div class="texter">
+              <h1>ProSign</h1>
+              <!-- <p>Signature électronique professionnelle</p> -->
+            </div>
+            
+          
         </div>
 
         <!-- Zone de signature -->

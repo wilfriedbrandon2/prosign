@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#FF3B30">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ProSign">
+    <title>ProSign - Signature électronique</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23FF3B30' rx='20'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-family='Arial'%3E✍️%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23FF3B30' rx='20'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-family='Arial'%3E✍️%3C/text%3E%3C/svg%3E">
+    <!-- Google Fonts Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Conteneur principal */
+        .app-container {
+            max-width: 550px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Glassmorphism card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 48px;
+            padding: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s;
+        }
+
+        /* Header avec logo */
+        .logo-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .logo-icon {
+            width: 70px;
+            height: 70px;
+            background: #FF3B30;
+            border-radius: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(255, 59, 48, 0.3);
+            margin-bottom: 16px;
+        }
+
+        .logo-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FF3B30, #C41E3A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-header p {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+            margin-top: 6px;
+        }
+
+        /* Titres de section */
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid #FF3B30;
+            padding-left: 14px;
+        }
+
+        /* Zone signature */
+        .signature-pad {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid #e5e5ea;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        canvas {
+            background: white;
+            width: 100%;
+            height: auto;
+            touch-action: none;
+            cursor: crosshair;
+            display: block;
+        }
+
+        /* Toolbar icônes */
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .icon-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 30px;
+            background: #f5f5f7;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+            color: #333;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:active {
+            transform: scale(0.94);
+            background: #FF3B30;
+            color: white;
+        }
+
+        /* Sélecteur de couleur (noir / rouge) */
+        .color-selector {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-bottom: 24px;
+            padding: 8px;
+            background: #f5f5f7;
+            border-radius: 60px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .color-opt {
+            width: 44px;
+            height: 44px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 3px solid transparent;
+        }
+
+        .color-opt.active {
+            border-color: #FF3B30;
+            transform: scale(1.05);
+            box-shadow: 0 0 0 2px rgba(255, 59, 48, 0.2);
+        }
+
+        /* Slider épaisseur */
+        .slider-control {
+            margin-bottom: 28px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            background: #e5e5ea;
+            border-radius: 4px;
+        }
+
+        input[type="range"]:focus {
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 22px;
+            background: #FF3B30;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(255, 59, 48, 0.4);
+        }
+
+        /* Boutons */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: #FF3B30;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 14px;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.97);
+            background: #C41E3A;
+        }
+
+        .btn-secondary {
+            background: rgba(0, 0, 0, 0.05);
+            color: #333;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 14px 20px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 14px;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-secondary:active {
+            transform: scale(0.97);
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-wa {
+            background: #25D366;
+            color: #075e54;
+        }
+
+        .btn-wa:active {
+            background: #1da15a;
+        }
+
+        /* Input téléphone */
+        .phone-input-wrapper {
+            margin-bottom: 16px;
+        }
+
+        .ios-input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid #e5e5ea;
+            border-radius: 60px;
+            font-size: 14px;
+            font-family: 'Montserrat', sans-serif;
+            background: white;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .ios-input:focus {
+            outline: none;
+            border-color: #FF3B30;
+            box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.1);
+        }
+
+        /* Toast notification */
+        .ios-toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            padding: 12px 24px;
+            border-radius: 60px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+            white-space: nowrap;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .ios-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Footer copyright */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            font-size: 12px;
+            color: #8E8E93;
+            font-weight: 500;
+        }
+
+        .footer i {
+            color: #FF3B30;
+            margin: 0 4px;
+        }
+
+        /* Responsive mobile - boutons plus petits */
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+            .glass-card {
+                padding: 20px;
+                border-radius: 36px;
+            }
+            .logo-icon {
+                width: 55px;
+                height: 55px;
+                font-size: 28px;
+                border-radius: 18px;
+            }
+            .logo-header h1 {
+                font-size: 26px;
+            }
+            .icon-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+            }
+            .color-opt {
+                width: 38px;
+                height: 38px;
+            }
+            .btn-primary, .btn-secondary {
+                padding: 11px 16px;
+                font-size: 12px;
+                min-width: 100px;
+            }
+            .section-title {
+                font-size: 14px;
+            }
+            .ios-input {
+                padding: 12px 16px;
+                font-size: 13px;
+            }
+            .footer {
+                margin-top: 20px;
+                padding: 15px;
+                font-size: 10px;
+            }
+        }
+
+        /* Pour très petits écrans */
+        @media (max-width: 380px) {
+            .btn-group {
+                gap: 8px;
+            }
+            .btn-primary, .btn-secondary {
+                padding: 10px 12px;
+                font-size: 11px;
+                min-width: 85px;
+            }
+            .icon-btn {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        /* Animation de chargement */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            animation: fadeIn 0.4s ease;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="glass-card">
+        <!-- Logo et titre -->
+        <div class="logo-header">
+            <div class="logo-icon">
+                <i class="fas fa-signature"></i>
+            </div>
+            <h1>ProSign</h1>
+            <p>Signature électronique professionnelle</p>
+        </div>
+
+        <!-- Zone de signature -->
+        <div class="section-title">
+            <i class="fas fa-draw-polygon"></i> Zone de signature
+        </div>
+        <div class="signature-pad">
+            <canvas id="signCanvas" width="550" height="220" style="width:100%; height:auto; touch-action:none"></canvas>
+        </div>
+
+        <!-- Toolbar Annuler/Rétablir/Effacer -->
+        <div class="toolbar">
+            <button class="icon-btn" id="undoBtn" title="Annuler"><i class="fas fa-undo-alt"></i></button>
+            <button class="icon-btn" id="redoBtn" title="Rétablir"><i class="fas fa-redo-alt"></i></button>
+            <button class="icon-btn" id="clearBtn" title="Effacer"><i class="fas fa-trash-alt"></i></button>
+        </div>
+
+        <!-- Sélecteur couleur (Noir / Rouge) -->
+        <div class="color-selector">
+            <div class="color-opt active" style="background: #000000" data-color="#000000" title="Noir"></div>
+            <div class="color-opt" style="background: #FF3B30" data-color="#FF3B30" title="Rouge"></div>
+        </div>
+
+        <!-- Épaisseur du trait -->
+        <div class="slider-control">
+            <div class="slider-label">
+                <span><i class="fas fa-pencil-alt"></i> Épaisseur du trait</span>
+                <span id="widthValue">2.5</span>
+            </div>
+            <input type="range" id="lineWidthSlider" min="1" max="8" step="0.5" value="2.5">
+        </div>
+
+        <!-- Boutons d'export -->
+        <div class="btn-group">
+            <button class="btn-primary" id="savePngBtn">
+                <i class="fas fa-download"></i> PNG sans fond
+            </button>
+            <button class="btn-primary" id="savePdfBtn">
+                <i class="fas fa-file-pdf"></i> PDF
+            </button>
+        </div>
+
+        <!-- Envoi WhatsApp -->
+        <div class="phone-input-wrapper">
+            <input type="tel" id="phoneNumber" class="ios-input" placeholder="Numéro WhatsApp (ex: 653154864)" value="237653154864">
+        </div>
+        <div class="btn-group">
+            <button class="btn-primary btn-wa" id="sendWaBtn">
+                <i class="fab fa-whatsapp"></i> Envoyer la signature
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer copyright -->
+    <div class="footer">
+        <i class="fas fa-copyright"></i> System237 - Tous droits réservés
+        <span style="margin: 0 8px">|</span>
+        <i class="fas fa-signature"></i> ProSign v4.0
+    </div>
+</div>
+
+<div id="iosToast" class="ios-toast">Message</div>
+
+<script>
+    // ==================== PROSIGN - COPYRIGHT SYSTEM237 ====================
+    console.log("ProSign v4.0 - © System237 - Signature sans fond");
+
+    // ==================== CANVAS & HISTORIQUE ====================
+    const canvas = document.getElementById('signCanvas');
+    let ctx = canvas.getContext('2d');
+    let drawing = false;
+    let history = [];
+    let historyIndex = -1;
+    let isUndoRedo = false;
+    let currentColor = '#000000';
+    let currentWidth = 2.5;
+
+    // Initialisation du canvas avec fond blanc pour l'affichage
+    // mais l'export sera sans fond (transparent)
+    function initCanvas() {
+        const container = canvas.parentElement;
+        const maxWidth = Math.min(550, container.clientWidth - 30);
+        canvas.style.width = `${maxWidth}px`;
+        canvas.width = maxWidth;
+        canvas.height = 200;
+        ctx = canvas.getContext('2d');
+        // Fond blanc pour l'affichage (permet de voir ce qu'on dessine)
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = currentColor;
+        ctx.lineWidth = currentWidth;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        saveToHistory();
+    }
+
+    // Sauvegarde dans l'historique
+    function saveToHistory() {
+        if (isUndoRedo) return;
+        const imageData = canvas.toDataURL();
+        if (historyIndex < history.length - 1) {
+            history = history.slice(0, historyIndex + 1);
+        }
+        history.push(imageData);
+        historyIndex = history.length - 1;
+        if (history.length > 50) history.shift();
+    }
+
+    function restoreFromHistory(index) {
+        if (index >= 0 && index < history.length) {
+            const img = new Image();
+            img.onload = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                historyIndex = index;
+            };
+            img.src = history[index];
+        }
+    }
+
+    function undo() {
+        if (historyIndex > 0) {
+            isUndoRedo = true;
+            historyIndex--;
+            restoreFromHistory(historyIndex);
+            isUndoRedo = false;
+            showToast('↩️ Annulé');
+        } else {
+            showToast('Rien à annuler');
+        }
+    }
+
+    function redo() {
+        if (historyIndex < history.length - 1) {
+            isUndoRedo = true;
+            historyIndex++;
+            restoreFromHistory(historyIndex);
+            isUndoRedo = false;
+            showToast('↪️ Rétabli');
+        } else {
+            showToast('Rien à rétablir');
+        }
+    }
+
+    function clearCanvas() {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'black';
+        saveToHistory();
+        showToast('Signature effacée');
+    }
+
+    // Gestion des événements de dessin
+    function getCoords(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        let clientX, clientY;
+        if (e.touches) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+        let x = (clientX - rect.left) * scaleX;
+        let y = (clientY - rect.top) * scaleY;
+        x = Math.min(Math.max(0, x), canvas.width);
+        y = Math.min(Math.max(0, y), canvas.height);
+        return { x, y };
+    }
+
+    function startDraw(e) {
+        drawing = true;
+        const { x, y } = getCoords(e);
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        e.preventDefault();
+    }
+
+    function draw(e) {
+        if (!drawing) return;
+        const { x, y } = getCoords(e);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        e.preventDefault();
+    }
+
+    function stopDraw() {
+        if (drawing) {
+            drawing = false;
+            ctx.beginPath();
+            saveToHistory();
+        }
+    }
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDraw);
+    canvas.addEventListener('touchstart', startDraw);
+    canvas.addEventListener('touchmove', draw);
+    canvas.addEventListener('touchend', stopDraw);
+    canvas.addEventListener('touchcancel', stopDraw);
+
+    // Sélecteur de couleur
+    document.querySelectorAll('.color-opt').forEach(opt => {
+        opt.addEventListener('click', () => {
+            document.querySelectorAll('.color-opt').forEach(c => c.classList.remove('active'));
+            opt.classList.add('active');
+            currentColor = opt.dataset.color;
+            ctx.strokeStyle = currentColor;
+        });
+    });
+
+    // Épaisseur du trait
+    document.getElementById('lineWidthSlider').addEventListener('input', (e) => {
+        currentWidth = parseFloat(e.target.value);
+        ctx.lineWidth = currentWidth;
+        document.getElementById('widthValue').textContent = currentWidth;
+    });
+
+    // Boutons
+    document.getElementById('undoBtn').addEventListener('click', undo);
+    document.getElementById('redoBtn').addEventListener('click', redo);
+    document.getElementById('clearBtn').addEventListener('click', clearCanvas);
+
+    // ==================== EXPORT SANS FOND (TRANSPARENT) ====================
+    function getSignatureTransparent() {
+        // Créer un canvas temporaire avec fond transparent
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // Remplir avec transparent
+        tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+        
+        // Dessiner la signature (récupérée du canvas principal sans le fond blanc)
+        // On dessine uniquement les traits noirs/rouges
+        tempCtx.drawImage(canvas, 0, 0);
+        
+        // Convertir le fond blanc en transparent
+        const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+        const data = imageData.data;
+        for (let i = 0; i < data.length; i += 4) {
+            // Si le pixel est blanc ou très proche du blanc
+            if (data[i] > 250 && data[i+1] > 250 && data[i+2] > 250) {
+                data[i+3] = 0; // Rendre transparent
+            }
+        }
+        tempCtx.putImageData(imageData, 0, 0);
+        
+        return tempCanvas.toDataURL('image/png');
+    }
+
+    // Sauvegarde PNG sans fond
+    document.getElementById('savePngBtn').addEventListener('click', () => {
+        const transparentURL = getSignatureTransparent();
+        const link = document.createElement('a');
+        link.download = 'prosign_signature_sans_fond.png';
+        link.href = transparentURL;
+        link.click();
+        showToast('✅ PNG sans fond sauvegardé');
+    });
+
+    // Export PDF (avec fond blanc pour le PDF)
+    document.getElementById('savePdfBtn').addEventListener('click', () => {
+        if (typeof window.jspdf === 'undefined') {
+            showToast('Chargement PDF...', true);
+            setTimeout(() => document.getElementById('savePdfBtn').click(), 500);
+            return;
+        }
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF();
+        // Pour le PDF, on utilise la signature visible avec fond blanc
+        const imgData = canvas.toDataURL('image/png');
+        pdf.addImage(imgData, 'PNG', 20, 40, 170, 60);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        pdf.setTextColor(100, 100, 100);
+        pdf.text('ProSign - Signature électronique © System237', 20, 120);
+        pdf.save('prosign_signature.pdf');
+        showToast('📄 PDF exporté');
+    });
+
+    // ==================== ENVOI WHATSAPP ====================
+    function dataURLToBlob(dataURL) {
+        const arr = dataURL.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) u8arr[n] = bstr.charCodeAt(n);
+        return new Blob([u8arr], { type: mime });
+    }
+
+    async function sendToWhatsApp(phoneNumber) {
+        // Utiliser la signature sans fond pour l'envoi
+        const transparentURL = getSignatureTransparent();
+        const blob = dataURLToBlob(transparentURL);
+        const file = new File([blob], 'prosign_signature_sans_fond.png', { type: 'image/png' });
+        
+        let cleanNumber = phoneNumber.replace(/[^0-9]/g, '');
+        if (cleanNumber.startsWith('6') && cleanNumber.length === 9) cleanNumber = '237' + cleanNumber;
+        if (cleanNumber.startsWith('0')) cleanNumber = '237' + cleanNumber.substring(1);
+        if (!cleanNumber.startsWith('237')) cleanNumber = '237' + cleanNumber;
+        
+        // Méthode Web Share (mobile)
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+                await navigator.share({
+                    title: 'ProSign - Ma signature',
+                    text: 'Signature électronique - © System237',
+                    files: [file]
+                });
+                showToast('✅ Signature partagée');
+                return;
+            } catch(e) {
+                console.log('Partage annulé');
+            }
+        }
+        
+        // Fallback : ouvrir WhatsApp et télécharger l'image
+        const waUrl = `https://wa.me/${cleanNumber}?text=Bonjour%2C%20voici%20ma%20signature%20%C3%A9lectronique%20(sans%20fond)%20g%C3%A9n%C3%A9r%C3%A9e%20avec%20ProSign%20%C2%A9%20System237.`;
+        window.open(waUrl, '_blank');
+        setTimeout(() => {
+            const link = document.createElement('a');
+            link.download = 'prosign_signature_sans_fond.png';
+            link.href = transparentURL;
+            link.click();
+        }, 800);
+        showToast(`📱 WhatsApp ouvert pour +${cleanNumber}`);
+    }
+
+    document.getElementById('sendWaBtn').addEventListener('click', () => {
+        const phone = document.getElementById('phoneNumber').value.trim();
+        if (!phone) {
+            showToast('❌ Entrez un numéro de téléphone', true);
+            return;
+        }
+        sendToWhatsApp(phone);
+    });
+
+    // ==================== TOAST NOTIFICATION ====================
+    function showToast(msg, isError = false) {
+        const toast = document.getElementById('iosToast');
+        toast.textContent = msg;
+        toast.style.background = isError ? '#FF3B30' : 'rgba(0, 0, 0, 0.85)';
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2500);
+    }
+
+    // ==================== INITIALISATION ====================
+    initCanvas();
+    window.addEventListener('resize', () => initCanvas());
+    showToast('✨ ProSign prêt - Signature sans fond');
+</script>
+</body>
+</html>
